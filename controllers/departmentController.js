@@ -29,3 +29,16 @@ exports.updateDepartment = (req, res) => {
     res.json({ message: "Department updated successfully" });
   });
 };
+
+exports.deleteDepartment = (req, res) => {
+  const { id } = req.params;
+
+  Department.deleteById(id, (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Department not found" });
+
+    res.json({ message: "Department deleted successfully" });
+  });
+};

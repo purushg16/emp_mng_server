@@ -46,6 +46,10 @@ const Department = {
 
     db.query(query, values, cb);
   },
+
+  deleteById: (id, cb) => {
+    db.query("DELETE FROM department WHERE id = ?", [id], cb);
+  },
 };
 
 module.exports = Department;

@@ -22,5 +22,6 @@ router.post("/update/:id", updateDepartmentValidationRules, (req, res) => {
 
   controller.updateDepartment(req, res);
 });
+router.delete("/delete/:id", controller.deleteDepartment);
 
 module.exports = router;

@@ -3,7 +3,11 @@ const router = express.Router();
 const adminAuth = require("../controllers/adminAuthController");
 const adminAuthMiddleware = require("../middleware/adminAuthMiddleware");
 
-router.post("/login", adminAuth.login);
-router.put("/change-password", adminAuthMiddleware, adminAuth.changePassword);
+router.post("/auth/login", adminAuth.login);
+router.put(
+  "/auth/change-password",
+  adminAuthMiddleware,
+  adminAuth.changePassword
+);
 
 module.exports = router;

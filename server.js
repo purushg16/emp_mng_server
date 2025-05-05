@@ -7,6 +7,7 @@ const adminAuthRoutes = require("./routes/admin/auth");
 const departmentRoutes = require("./routes/admin/department");
 const leaveTypeRoutes = require("./routes/admin/leaveType");
 const employeeRoutes = require("./routes/admin/employee");
+const leaveRoutes = require("./routes/admin/leave");
 
 const adminAuthMiddleware = require("./middleware/adminAuthMiddleware");
 
@@ -21,6 +22,7 @@ app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin/departments", adminAuthMiddleware, departmentRoutes);
 app.use("/api/admin/leaveType", adminAuthMiddleware, leaveTypeRoutes);
 app.use("/api/admin/employee", adminAuthMiddleware, employeeRoutes);
+app.use("/api/admin/leave", adminAuthMiddleware, leaveRoutes);
 
 // === Server Listener ===
 const PORT = process.env.PORT || 5000;

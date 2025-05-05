@@ -5,6 +5,7 @@ require("dotenv").config();
 const app = express();
 const adminRoutes = require("./routes/adminRoutes");
 const departmentRoutes = require("./routes/department");
+const leaveTypeRoutes = require("./routes/leaveType");
 const adminAuthMiddleware = require("./middleware/adminAuthMiddleware");
 
 // === Middlewares ===
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Admin:
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/departments", adminAuthMiddleware, departmentRoutes);
+app.use("/api/admin/leaveType", adminAuthMiddleware, leaveTypeRoutes);
 
 // === Server Listener ===
 const PORT = process.env.PORT || 5000;

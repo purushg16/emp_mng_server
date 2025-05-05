@@ -17,7 +17,6 @@ exports.getAllDepartments = (_req, res) => {
 };
 
 exports.updateDepartment = (req, res) => {
-  console.log(req.params);
   const { id } = req.params;
   const dataToUpdate = req.body;
 

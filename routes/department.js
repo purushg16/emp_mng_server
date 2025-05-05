@@ -1,27 +1,29 @@
 const express = require("express");
-const router = express.Router();
-const controller = require("../controllers/departmentController");
+const {
+  createDepartment,
+  deleteDepartment,
+  getAllDepartments,
+  updateDepartment,
+} = require("../controllers/departmentController");
 const {
   departmentValidationRules,
   updateDepartmentValidationRules,
 } = require("../validators/departmentValidator");
-const { validationResult } = require("express-validator");
+const validate = require("../middleware/validate");
 
-router.get("/getAll", controller.getAllDepartments);
-router.post("/create", departmentValidationRules, (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
+const router = express.Router();
 
-  controller.createDepartment(req, res);
-});
-router.post("/update/:id", updateDepartmentValidationRules, (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
+router.get("/getAll", getAllDepartments);
 
-  controller.updateDepartment(req, res);
-});
-router.delete("/delete/:id", controller.deleteDepartment);
+router.post("/create", departmentValidationRules, validate, createDepartment);
+
+router.post(
+  "/update/:id",
+  updateDepartmentValidationRules,
+  validate,
+  updateDepartment
+);
+
+router.delete("/delete/:id", deleteDepartment);
 
 module.exports = router;

@@ -41,6 +41,14 @@ const updateDepartmentValidationRules = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage("Short name must be 2–50 characters"),
+  body().custom((value) => {
+    if (!value || Object.keys(value).length === 0) {
+      throw new Error(
+        "At least one field (type or description) must be provided"
+      );
+    }
+    return true;
+  }),
 ];
 
 module.exports = { updateDepartmentValidationRules, departmentValidationRules };

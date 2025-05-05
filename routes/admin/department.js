@@ -4,12 +4,12 @@ const {
   deleteDepartment,
   getAllDepartments,
   updateDepartment,
-} = require("../controllers/departmentController");
+} = require("../../controllers/departmentController");
 const {
   departmentValidationRules,
   updateDepartmentValidationRules,
-} = require("../validators/departmentValidator");
-const validate = require("../middleware/validate");
+} = require("../../validators/departmentValidator");
+const validate = require("../../middleware/validate");
 
 const router = express.Router();
 

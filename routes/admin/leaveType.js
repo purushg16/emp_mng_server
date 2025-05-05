@@ -1,10 +1,10 @@
 const express = require("express");
-const leaveTypeController = require("../controllers/leaveTypeController");
+const leaveTypeController = require("../../controllers/leaveTypeController");
 const {
   leaveTypeValidator,
   leaveTypeUpdateValidator,
-} = require("../validators/leaveTypeValidator");
-const validate = require("../middleware/validate");
+} = require("../../validators/leaveTypeValidator");
+const validate = require("../../middleware/validate");
 
 const router = express.Router();
 

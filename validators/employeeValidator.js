@@ -5,6 +5,10 @@ const addEmployeeValidation = [
   body("firstName").trim().notEmpty().withMessage("First name is required"),
   body("lastName").trim().notEmpty().withMessage("Last name is required"),
   body("email").isEmail().withMessage("Valid email is required"),
+  body("status")
+    .optional()
+    .isIn(["active", "inactive"])
+    .withMessage("Status must be either 'active' or 'inactive'"),
   body("mobile")
     .isNumeric()
     .withMessage("Mobile must be numeric")
@@ -29,6 +33,10 @@ const updateEmployeeValidation = [
   body("firstName").optional().trim(),
   body("lastName").optional().trim(),
   body("email").optional().isEmail().withMessage("Valid email is required"),
+  body("status")
+    .optional()
+    .isIn(["active", "inactive"])
+    .withMessage("Status must be either 'active' or 'inactive'"),
   body("mobile")
     .optional()
     .isNumeric()

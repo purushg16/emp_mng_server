@@ -6,6 +6,7 @@ const Employee = {
       firstName,
       lastName,
       email,
+      status,
       mobile,
       password,
       code,
@@ -21,7 +22,7 @@ const Employee = {
       INSERT INTO employee (
         firstName, lastName, email, mobile, password,
         code, gender, birthday, departmentId,
-        country, city, address
+        country, city, address, status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -40,6 +41,7 @@ const Employee = {
         country,
         city,
         address,
+        status || "active",
       ],
       cb
     );

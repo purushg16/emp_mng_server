@@ -6,6 +6,8 @@ const app = express();
 const adminAuthRoutes = require("./routes/admin/auth");
 const departmentRoutes = require("./routes/admin/department");
 const leaveTypeRoutes = require("./routes/admin/leaveType");
+const employeeRoutes = require("./routes/admin/employee");
+
 const adminAuthMiddleware = require("./middleware/adminAuthMiddleware");
 
 // === Middlewares ===
@@ -18,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin/departments", adminAuthMiddleware, departmentRoutes);
 app.use("/api/admin/leaveType", adminAuthMiddleware, leaveTypeRoutes);
+app.use("/api/admin/employee", adminAuthMiddleware, employeeRoutes);
 
 // === Server Listener ===
 const PORT = process.env.PORT || 5000;

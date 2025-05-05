@@ -1,10 +1,5 @@
 const express = require("express");
-const {
-  createDepartment,
-  deleteDepartment,
-  getAllDepartments,
-  updateDepartment,
-} = require("../../controllers/departmentController");
+const departmentController = require("../../controllers/departmentController");
 const {
   departmentValidationRules,
   updateDepartmentValidationRules,
@@ -13,17 +8,22 @@ const validate = require("../../middleware/validate");
 
 const router = express.Router();
 
-router.get("/getAll", getAllDepartments);
+router.get("/getAll", departmentController.getAllDepartments);
 
-router.post("/create", departmentValidationRules, validate, createDepartment);
+router.post(
+  "/create",
+  departmentValidationRules,
+  validate,
+  departmentController.createDepartment
+);
 
 router.post(
   "/update/:id",
   updateDepartmentValidationRules,
   validate,
-  updateDepartment
+  departmentController.updateDepartment
 );
 
-router.delete("/delete/:id", deleteDepartment);
+router.delete("/delete/:id", departmentController.deleteDepartment);
 
 module.exports = router;

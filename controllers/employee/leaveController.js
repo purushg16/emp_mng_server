@@ -2,8 +2,18 @@ const Leave = require("../../models/Leave");
 
 exports.getEmployeeLeaves = (req, res) => {
   const employeeId = req.userId;
+  const status = req.query.status;
 
-  Leave.findByEmployeeId(employeeId, (err, leaves) => {
+  const validStatuses = ["pending", "approved", "declined"];
+
+  if (status && !validStatuses.includes(status)) {
+    return res.status(400).json({
+      message:
+        "Invalid status. Valid values are: 'pending', 'approved', 'declined'.",
+    });
+  }
+
+  Leave.findByEmployeeId(employeeId, status, (err, leaves) => {
     if (err) return res.status(500).json({ message: "Error fetching leaves" });
 
     if (!leaves.length) {
@@ -11,6 +21,21 @@ exports.getEmployeeLeaves = (req, res) => {
     }
 
     res.status(200).json({ leaves });
+  });
+};
+
+exports.getLeaveById = (req, res) => {
+  const { id } = req.params;
+  const employeeId = req.userId;
+
+  Leave.findById(id, (err, leave) => {
+    if (err) return res.status(500).json({ message: "Error fetching leave" });
+
+    if (!leave || leave.employeeId !== employeeId) {
+      return res.status(404).json({ message: "Leave not found" });
+    }
+
+    res.status(200).json({ leave });
   });
 };
 

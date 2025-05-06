@@ -46,11 +46,22 @@ const Leave = {
   },
 
   findById: (id, cb) => {
-    db.query(`SELECT * FROM leaves WHERE id = ?`, [id], cb);
+    db.query("SELECT * FROM leaves WHERE id = ?", [id], (err, results) => {
+      if (err) return cb(err);
+      cb(null, results[0]); // return single leave
+    });
   },
 
-  findByEmployeeId: (employeeId, cb) => {
-    db.query("SELECT * FROM leaves WHERE employeeId = ?", [employeeId], cb);
+  findByEmployeeId: (employeeId, status, cb) => {
+    let sql = "SELECT * FROM leaves WHERE employeeId = ?";
+    const params = [employeeId];
+
+    if (status && typeof status === "string") {
+      sql += " AND status = ?";
+      params.push(status);
+    }
+
+    db.query(sql, params, cb);
   },
 
   updateStatus: (id, status, remark, cb) => {

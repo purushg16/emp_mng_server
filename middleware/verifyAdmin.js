@@ -12,6 +12,7 @@ module.exports = function verifyAdmin(req, res, next) {
     if (err) return res.status(403).json({ message: "Invalid token" });
 
     req.adminId = decoded.adminId;
+    req.userRole = decoded.role; // "admin" or "employee"
     next();
   });
 };

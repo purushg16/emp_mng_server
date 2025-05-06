@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
       return res.status(403).json({ message: "Invalid or expired token" });
 
     req.employeeId = decoded.employeeId; // Inject employeeId into request
+    req.userRole = decoded.role; // "admin" or "employee"
     next();
   });
 };

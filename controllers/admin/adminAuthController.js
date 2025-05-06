@@ -14,9 +14,13 @@ exports.login = (req, res) => {
       if (!isMatch)
         return res.status(401).json({ message: "Invalid credentials" });
 
-      const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { adminId: admin.id, role: "admin" },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
 
       if (admin.firstLogin) {
         Admin.updateFirstLogin(admin.id, (err2) => {

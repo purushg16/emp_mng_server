@@ -83,10 +83,16 @@ const Employee = {
     const fields = [];
     const values = [];
 
+    const protectedFields = ["code", "status", "departmentId"];
+
     for (let key in data) {
+      if (protectedFields.includes(key)) continue;
+
       fields.push(`${key} = ?`);
       values.push(data[key]);
     }
+
+    if (fields.length === 0) return cb(null);
 
     const sql = `UPDATE employee SET ${fields.join(", ")} WHERE id = ?`;
     values.push(id);

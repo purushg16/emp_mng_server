@@ -8,7 +8,7 @@ exports.login = (req, res) => {
 
   Employee.findByEmail(email, (err, result) => {
     if (err || result.length === 0)
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "No users found!" });
 
     const employee = result[0];
 
@@ -17,7 +17,7 @@ exports.login = (req, res) => {
         return res.status(401).json({ message: "Invalid credentials" });
 
       const token = jwt.sign(
-        { employeeId: employee.id },
+        { employeeId: employee.id, role: "employee" },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
@@ -36,6 +36,29 @@ exports.login = (req, res) => {
         });
       });
     });
+  });
+};
+
+exports.updateProfile = (req, res) => {
+  const { employeeId, userRole } = req;
+  const updates = { ...req.body };
+
+  // Restricting Employee from updating certain fields
+  if (userRole === "employee") {
+    const restrictedFields = ["code", "departmentId", "status"];
+
+    Object.keys(updates).forEach((key) => {
+      if (restrictedFields.includes(key)) delete updates[key];
+    });
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No data provided for update" });
+  }
+
+  Employee.update(employeeId, updates, (err) => {
+    if (err) return res.status(500).json({ message: "Update failed" });
+    res.json({ message: "Profile updated successfully" });
   });
 };
 

@@ -1,4 +1,4 @@
-const Department = require("../models/Department");
+const Department = require("../../models/Department");
 
 exports.createDepartment = (req, res) => {
   Department.create(req.body, (err, _result) => {

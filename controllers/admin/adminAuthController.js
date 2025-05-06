@@ -1,13 +1,11 @@
-const Admin = require("../models/Admin");
+const Admin = require("../../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.login = (req, res) => {
-  console.log(req.body);
   const { username, password } = req.body;
 
   Admin.findByUsername(username, (err, result) => {
-    console.log(result);
     if (err || result.length === 0)
       return res.status(401).json({ message: "Invalid credentials" });
 
@@ -44,7 +42,7 @@ exports.changePassword = (req, res) => {
       return res.status(400).json({ message: "Admin not found" });
 
     const admin = result[0];
-    bcrypt.compare(oldPassword, admin.password, async (err, isMatch) => {
+    bcrypt.compare(oldPassword, admin.password, async (_err, isMatch) => {
       if (!isMatch)
         return res.status(400).json({ message: "Incorrect old password" });
 

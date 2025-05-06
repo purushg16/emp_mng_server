@@ -1,4 +1,4 @@
-const Employee = require("../models/Employee");
+const Employee = require("../../models/Employee");
 const bcrypt = require("bcryptjs");
 
 exports.createEmployee = async (req, res) => {

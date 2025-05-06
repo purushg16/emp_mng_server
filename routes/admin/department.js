@@ -1,5 +1,5 @@
 const express = require("express");
-const departmentController = require("../../controllers/departmentController");
+const departmentController = require("../../controllers/admin/departmentController");
 const {
   departmentValidationRules,
   updateDepartmentValidationRules,

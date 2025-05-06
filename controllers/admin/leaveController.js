@@ -1,4 +1,4 @@
-const Leave = require("../models/Leave");
+const Leave = require("../../models/Leave");
 
 exports.getAllLeaves = (_req, res) => {
   Leave.findAll((err, rows) => {

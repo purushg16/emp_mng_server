@@ -1,13 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const adminAuth = require("../../controllers/adminAuthController");
-const adminAuthMiddleware = require("../../middleware/adminAuthMiddleware");
+const adminAuth = require("../../controllers/admin/adminAuthController");
+const verifyAdmin = require("../../middleware/verifyAdmin");
 
 router.post("/auth/login", adminAuth.login);
-router.put(
-  "/auth/change-password",
-  adminAuthMiddleware,
-  adminAuth.changePassword
-);
+router.put("/auth/change-password", verifyAdmin, adminAuth.changePassword);
 
 module.exports = router;

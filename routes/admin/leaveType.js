@@ -1,5 +1,5 @@
 const express = require("express");
-const leaveTypeController = require("../../controllers/leaveTypeController");
+const leaveTypeController = require("../../controllers/admin/leaveTypeController");
 const {
   leaveTypeValidator,
   leaveTypeUpdateValidator,

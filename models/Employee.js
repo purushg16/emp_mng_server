@@ -1,6 +1,30 @@
 const db = require("../config/db");
 
 const Employee = {
+  findByEmail: (email, cb) => {
+    db.query("SELECT * FROM employee WHERE email = ?", [email], cb);
+  },
+
+  updateLoginHistory: (id, cb) => {
+    db.query(
+      `UPDATE employees
+       SET logins = JSON_ARRAY_APPEND(
+         IFNULL(logins, JSON_ARRAY()), '$', NOW()
+       ) 
+       WHERE id = ?`,
+      [id],
+      cb
+    );
+  },
+
+  updatePassword: (id, hashedPassword, cb) => {
+    db.query(
+      "UPDATE employee SET password = ? WHERE id = ?",
+      [hashedPassword, id],
+      cb
+    );
+  },
+
   create: (data, cb) => {
     const {
       firstName,

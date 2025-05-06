@@ -10,7 +10,8 @@ module.exports = {
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return res.status(403).json({ message: "Invalid token" });
 
-      req.userId = decoded.id;
+      req.userId =
+        decoded.role === "admin" ? decoded.adminId : decoded.employeeId;
       req.userRole = decoded.role;
       next();
     });

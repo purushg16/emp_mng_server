@@ -1,5 +1,6 @@
 const express = require("express");
-const verifyAdmin = require("../../middleware/verifyAdmin");
+// const verifyToken = require("../../middleware/verifyToken");
+const { isAdmin, verifyToken } = require("../../middleware/authMiddleware");
 
 const departmentRoutes = require("./department");
 const leaveTypeRoutes = require("./leaveType");
@@ -13,10 +14,15 @@ const router = express.Router();
 router.post("/auth/login", adminAuth.login);
 
 // Protected routes
-router.put("/auth/change-password", verifyAdmin, adminAuth.changePassword);
-router.use("/departments", verifyAdmin, departmentRoutes);
-router.use("/leaveType", verifyAdmin, leaveTypeRoutes);
-router.use("/employee", verifyAdmin, employeeRoutes);
-router.use("/leave", verifyAdmin, leaveRoutes);
+router.put(
+  "/auth/change-password",
+  verifyToken,
+  isAdmin,
+  adminAuth.changePassword
+);
+router.use("/departments", verifyToken, isAdmin, departmentRoutes);
+router.use("/leaveType", verifyToken, isAdmin, leaveTypeRoutes);
+router.use("/employee", verifyToken, isAdmin, employeeRoutes);
+router.use("/leave", verifyToken, isAdmin, leaveRoutes);
 
 module.exports = router;

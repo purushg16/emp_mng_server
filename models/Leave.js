@@ -21,17 +21,28 @@ const Leave = {
     );
   },
 
-  findAll: (cb) => {
-    db.query(
-      `SELECT l.*, 
-              e.firstName, e.lastName, 
-              lt.type AS leaveTypeName 
-       FROM leaves l
-       JOIN employee e ON l.employeeId = e.id
-       JOIN leave_type lt ON l.leaveTypeId = lt.id
-       ORDER BY l.postedAt DESC`,
-      cb
-    );
+  findAll: (status, cb) => {
+    let query = `
+      SELECT l.*, 
+             e.firstName, e.lastName, 
+             lt.type AS leaveTypeName 
+      FROM leaves l
+      JOIN employee e ON l.employeeId = e.id
+      JOIN leave_type lt ON l.leaveTypeId = lt.id
+    `;
+
+    const values = [];
+
+    // Add status condition if it's provided
+    if (status) {
+      query += " WHERE l.status = ?";
+      values.push(status);
+    }
+
+    // Ordering remains the same
+    query += " ORDER BY l.postedAt DESC";
+
+    db.query(query, values, cb);
   },
 
   findById: (id, cb) => {

@@ -3,8 +3,6 @@ const Leave = require("../../models/Leave");
 exports.getEmployeeLeaves = (req, res) => {
   const employeeId = req.userId;
 
-  console.log(req.employeeId);
-
   Leave.findByEmployeeId(employeeId, (err, leaves) => {
     if (err) return res.status(500).json({ message: "Error fetching leaves" });
 
@@ -44,9 +42,7 @@ exports.createLeave = async (req, res) => {
 
       // proceed with creation
       Leave.create(leaveReq, (err2, _result2) => {
-        console.log(leaveReq);
         if (err2) {
-          console.log(err2);
           return res.status(500).json({ message: "Error applying leave" });
         }
         res.status(201).json({ message: "Leave applied successfully" });

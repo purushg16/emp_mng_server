@@ -38,8 +38,6 @@ exports.updateLeaveType = (req, res) => {
   const { id } = req.params;
   const dataToUpdate = req.body;
 
-  console.log(id, dataToUpdate);
-
   if (dataToUpdate)
     LeaveType.update(id, dataToUpdate, (err, result) => {
       if (err) return res.status(500).json({ error: err.message });

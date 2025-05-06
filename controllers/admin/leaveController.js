@@ -1,9 +1,27 @@
 const Leave = require("../../models/Leave");
 
-exports.getAllLeaves = (_req, res) => {
-  Leave.findAll((err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+exports.getAllLeaves = (req, res) => {
+  const status = req.query.status;
+
+  const validStatuses = ["pending", "approved", "declined"];
+
+  if (status && !validStatuses.includes(status)) {
+    return res
+      .status(400)
+      .json({
+        message:
+          "Invalid status. Valid values are: 'pending', 'approved', 'declined'.",
+      });
+  }
+
+  Leave.findAll(status, (err, leaves) => {
+    if (err) return res.status(500).json({ message: "Error fetching leaves" });
+
+    if (!leaves.length) {
+      return res.status(404).json({ message: "No leaves found" });
+    }
+
+    res.status(200).json({ leaves });
   });
 };
 

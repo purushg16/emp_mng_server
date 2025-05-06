@@ -1,6 +1,26 @@
 const db = require("../config/db");
 
 const Leave = {
+  create: (data, cb) => {
+    const { employeeId, leaveTypeId, from, to, desc } = data;
+    db.query(
+      "INSERT INTO leaves (employeeId, leaveTypeId, `from`, `to`, `desc`) VALUES (?, ?, ?, ?, ?)",
+      [employeeId, leaveTypeId, from, to, desc],
+      cb
+    );
+  },
+
+  findOverlapping: (employeeId, from, to, cb) => {
+    db.query(
+      `SELECT * FROM leaves 
+       WHERE employeeId = ? 
+          AND status != 'declined'
+          AND NOT (DATE(\`to\`) < DATE(?) OR DATE(\`from\`) > DATE(?))`,
+      [employeeId, from, to],
+      cb
+    );
+  },
+
   findAll: (cb) => {
     db.query(
       `SELECT l.*, 
@@ -16,6 +36,10 @@ const Leave = {
 
   findById: (id, cb) => {
     db.query(`SELECT * FROM leaves WHERE id = ?`, [id], cb);
+  },
+
+  findByEmployeeId: (employeeId, cb) => {
+    db.query("SELECT * FROM leaves WHERE employeeId = ?", [employeeId], cb);
   },
 
   updateStatus: (id, status, remark, cb) => {

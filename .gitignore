@@ -8,6 +8,7 @@ yarn-error.log*
 
 # Dependencies
 node_modules/
+.vscode/
 
 # Production
 /dist

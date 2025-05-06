@@ -1,16 +1,17 @@
-const { body } = require("express-validator");
+const yup = require("yup");
 
-const leaveUpdateValidation = [
-  body("status")
-    .notEmpty()
-    .withMessage("Status is required")
-    .isIn(["approved", "declined"])
-    .withMessage("Status must be either 'approved' or 'declined'"),
-  body("remark")
-    .optional()
-    .trim()
-    .isString()
-    .withMessage("Remark must be a string"),
-];
+// Leave Update Validation
+const leaveUpdateSchema = yup.object({
+  status: yup
+    .string()
+    .required("Status is required")
+    .oneOf(
+      ["approved", "declined"],
+      'Status must be either "approved" or "declined"'
+    ),
 
-module.exports = { leaveUpdateValidation };
+  remark: yup.string().trim().optional(),
+  // .matches(/^.*$/, "Remark must be a string"),
+});
+
+module.exports = { leaveUpdateSchema };

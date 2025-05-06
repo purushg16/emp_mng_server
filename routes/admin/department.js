@@ -1,8 +1,8 @@
 const express = require("express");
 const departmentController = require("../../controllers/admin/departmentController");
 const {
-  departmentValidationRules,
-  updateDepartmentValidationRules,
+  departmentSchema,
+  updateDepartmentSchema,
 } = require("../../validators/departmentValidator");
 const validate = require("../../middleware/validate");
 
@@ -12,15 +12,13 @@ router.get("/getAll", departmentController.getAllDepartments);
 
 router.post(
   "/create",
-  departmentValidationRules,
-  validate,
+  validate(departmentSchema),
   departmentController.createDepartment
 );
 
 router.post(
   "/update/:id",
-  updateDepartmentValidationRules,
-  validate,
+  validate(updateDepartmentSchema),
   departmentController.updateDepartment
 );
 

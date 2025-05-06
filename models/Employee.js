@@ -47,7 +47,7 @@ const Employee = {
         firstName, lastName, email, mobile, password,
         code, gender, birthday, departmentId,
         country, city, address, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(

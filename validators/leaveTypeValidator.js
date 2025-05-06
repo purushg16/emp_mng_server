@@ -1,37 +1,38 @@
-const { check, body } = require("express-validator");
+const yup = require("yup");
 
-const leaveTypeValidator = [
-  check("type")
+// Leave Type Validation (required fields)
+const leaveTypeSchema = yup.object({
+  type: yup
+    .string()
     .trim()
-    .notEmpty()
-    .isLength({ min: 2, max: 50 })
-    .withMessage("Leave type is required"),
-  check("description")
-    .optional()
-    .trim()
-    .isLength({ max: 255 })
-    .withMessage("Description is too long"),
-];
+    .required("Leave type is required")
+    .min(2, "Leave type must be at least 2 characters")
+    .max(50, "Leave type must be at most 50 characters"),
 
-const leaveTypeUpdateValidator = [
-  check("type")
-    .optional()
+  description: yup
+    .string()
     .trim()
-    .notEmpty()
-    .withMessage("Leave type cannot be empty"),
-  check("description")
-    .optional()
-    .trim()
-    .isLength({ max: 255 })
-    .withMessage("Description is too long"),
-  body().custom((value) => {
-    if (!value || Object.keys(value).length === 0) {
-      throw new Error(
-        "At least one field (type or description) must be provided"
-      );
+    .max(255, "Description is too long")
+    .optional(),
+});
+
+// Leave Type Update Validation (optional fields)
+const leaveTypeUpdateSchema = yup
+  .object({
+    type: yup.string().trim().min(2).max(50).optional(),
+    description: yup
+      .string()
+      .trim()
+      .max(255, "Description is too long")
+      .optional(),
+  })
+  .test(
+    "at-least-one-field",
+    "At least one field (type or description) must be provided",
+    function (value) {
+      const { type, description } = value || {};
+      return !!type || !!description;
     }
-    return true;
-  }),
-];
+  );
 
-module.exports = { leaveTypeValidator, leaveTypeUpdateValidator };
+module.exports = { leaveTypeSchema, leaveTypeUpdateSchema };

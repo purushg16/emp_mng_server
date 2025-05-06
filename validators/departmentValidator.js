@@ -1,54 +1,60 @@
-const { body } = require("express-validator");
+const yup = require("yup");
 
-const departmentValidationRules = [
-  body("code")
+// Validation schema for department creation
+const departmentSchema = yup.object({
+  code: yup
+    .string()
     .trim()
-    .notEmpty()
-    .withMessage("Dept. code is required")
-    .isLength({ min: 3, max: 20 })
-    .withMessage("Code must be at most 20 characters"),
+    .required("Dept. code is required")
+    .min(3, "Code must be at least 3 characters")
+    .max(20, "Code must be at most 20 characters"),
 
-  body("name")
+  name: yup
+    .string()
     .trim()
-    .notEmpty()
-    .withMessage("Dept. name is required")
-    .isLength({ min: 3, max: 100 })
-    .withMessage("Name must be at most 100 characters"),
+    .required("Dept. name is required")
+    .min(3, "Name must be at least 3 characters")
+    .max(100, "Name must be at most 100 characters"),
 
-  body("shortName")
+  shortName: yup
+    .string()
     .trim()
-    .notEmpty()
-    .withMessage("Short name is required")
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Short name must be at most 50 characters"),
-];
+    .required("Short name is required")
+    .min(3, "Short name must be at least 3 characters")
+    .max(50, "Short name must be at most 50 characters"),
+});
 
-const updateDepartmentValidationRules = [
-  body("code")
-    .optional()
-    .trim()
-    .isLength({ min: 3, max: 20 })
-    .withMessage("Code must be 3–20 characters"),
+// Validation schema for updating a department
+const updateDepartmentSchema = yup
+  .object({
+    code: yup
+      .string()
+      .optional()
+      .trim()
+      .min(3, "Code must be at least 3 characters")
+      .max(20, "Code must be at most 20 characters"),
 
-  body("name")
-    .optional()
-    .trim()
-    .isLength({ min: 3, max: 100 })
-    .withMessage("Name must be 3–100 characters"),
+    name: yup
+      .string()
+      .optional()
+      .trim()
+      .min(3, "Name must be at least 3 characters")
+      .max(100, "Name must be at most 100 characters"),
 
-  body("shortName")
-    .optional()
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage("Short name must be 2–50 characters"),
-  body().custom((value) => {
-    if (!value || Object.keys(value).length === 0) {
-      throw new Error(
-        "At least one field (type or description) must be provided"
-      );
+    shortName: yup
+      .string()
+      .optional()
+      .trim()
+      .min(2, "Short name must be at least 2 characters")
+      .max(50, "Short name must be at most 50 characters"),
+  })
+  .test(
+    "at-least-one-field",
+    "At least one field (code, name, or shortName) must be provided",
+    function (value) {
+      const { code, name, shortName } = value || {};
+      return !!code || !!name || !!shortName;
     }
-    return true;
-  }),
-];
+  );
 
-module.exports = { updateDepartmentValidationRules, departmentValidationRules };
+module.exports = { departmentSchema, updateDepartmentSchema };

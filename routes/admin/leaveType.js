@@ -1,8 +1,8 @@
 const express = require("express");
 const leaveTypeController = require("../../controllers/admin/leaveTypeController");
 const {
-  leaveTypeValidator,
-  leaveTypeUpdateValidator,
+  leaveTypeSchema,
+  leaveTypeUpdateSchema,
 } = require("../../validators/leaveTypeValidator");
 const validate = require("../../middleware/validate");
 
@@ -17,16 +17,14 @@ router.get("/get/:id", leaveTypeController.getLeaveTypeById);
 // Create a new leave type
 router.post(
   "/create",
-  leaveTypeValidator,
-  validate,
+  validate(leaveTypeSchema),
   leaveTypeController.createLeaveType
 );
 
 // Update leave type by ID
 router.put(
   "/update/:id",
-  leaveTypeUpdateValidator,
-  validate,
+  validate(leaveTypeUpdateSchema),
   leaveTypeController.updateLeaveType
 );
 

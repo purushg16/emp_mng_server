@@ -9,7 +9,7 @@ router.post("/auth/login", employeeAuth.login);
 
 // Protected routes
 router.put(
-  "/auth/change-password",
+  "/auth/update-password",
   verifyEmployee,
   employeeAuth.updatePassword
 );

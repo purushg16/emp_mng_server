@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const employeeController = require("../../controllers/admin/employeeController");
 const {
-  addEmployeeValidation,
-  updateEmployeeValidation,
+  addEmployeeSchema,
+  updateEmployeeSchema,
 } = require("../../validators/employeeValidator");
 const validate = require("../../middleware/validate");
 
@@ -12,14 +12,12 @@ router.get("/get/:id", employeeController.getEmployeeById);
 
 router.post(
   "/create",
-  addEmployeeValidation,
-  validate,
+  validate(addEmployeeSchema),
   employeeController.createEmployee
 );
 router.put(
   "/update/:id",
-  updateEmployeeValidation,
-  validate,
+  validate(updateEmployeeSchema),
   employeeController.updateEmployee
 );
 

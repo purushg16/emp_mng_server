@@ -2,19 +2,19 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Employee = require("../../models/Employee");
 const LoginHistory = require("../../models/LoginHistory");
+const { error, success } = require("../../utils/response");
 
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
   Employee.findByEmail(email, (err, result) => {
     if (err || result.length === 0)
-      return res.status(401).json({ message: "No users found!" });
+      return error(res, "Invalid Credentials", 401);
 
     const employee = result[0];
 
     bcrypt.compare(password, employee.password, (_err2, isMatch) => {
-      if (!isMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
+      if (!isMatch) return error(res, "Invalid Credentials", 401);
 
       const token = jwt.sign(
         { employeeId: employee.id, role: "employee" },
@@ -26,13 +26,14 @@ exports.login = (req, res) => {
         if (logErr) console.error("Login history failed:", logErr);
 
         LoginHistory.countByEmployeeId(employee.id, (countErr, countResult) => {
-          if (countErr)
-            return res
-              .status(500)
-              .json({ message: "Failed to fetch login count" });
+          if (countErr) return error(res, countErr);
 
           const loginCount = countResult[0].count;
-          res.status(200).json({ token, employee, loginCount });
+          return success(
+            res,
+            { token, employee, loginCount },
+            "Login successful"
+          );
         });
       });
     });
@@ -53,49 +54,43 @@ exports.updateProfile = (req, res) => {
   }
 
   if (Object.keys(updates).length === 0) {
-    return res.status(400).json({ message: "No data provided for update" });
+    return error(res, "No data provided for update", 400);
   }
 
   Employee.update(employeeId, updates, (err) => {
-    if (err) return res.status(500).json({ message: "Update failed" });
-    res.json({ message: "Profile updated successfully" });
+    if (err) return error(res, err);
+
+    return success(res, {}, "Profile updated successfully");
   });
 };
 
 exports.updatePassword = (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
-  if (!oldPassword || !newPassword || newPassword.length < 6) {
-    return res.status(400).json({
-      message:
-        "Old and new password are required. New password must be at least 6 characters.",
-    });
-  }
+  if (!oldPassword) return error(res, "Old password is required", 400);
+  if (!newPassword) return error(res, "New password is required", 400);
+  if (newPassword.length < 6)
+    return error(res, "password must be at least 6 characters", 400);
 
-  // Step 1: Get current employee
   Employee.findById(req.employeeId, (err, result) => {
     if (err || result.length === 0) {
-      return res.status(404).json({ message: "Employee not found" });
+      return error(res, "Employee not found", 404);
     }
 
     const employee = result[0];
 
-    // Step 2: Compare old password
     bcrypt.compare(oldPassword, employee.password, (err2, isMatch) => {
       if (err2 || !isMatch) {
-        return res.status(401).json({ message: "Old password is incorrect" });
+        return error(res, "Old password is incorrect", 401);
       }
 
-      // Step 3: Hash and update new password
       bcrypt.hash(newPassword, 10, (err3, hashedPassword) => {
-        if (err3)
-          return res.status(500).json({ message: "Error hashing password" });
+        if (err3) return error(res, err3);
 
         Employee.updatePassword(req.employeeId, hashedPassword, (err4) => {
-          if (err4)
-            return res.status(500).json({ message: "Password update failed" });
+          if (err4) return error(res, err4);
 
-          res.json({ message: "Password updated successfully" });
+          return success(res, {}, "Password updated successfully");
         });
       });
     });

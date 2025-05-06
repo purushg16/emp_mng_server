@@ -1,23 +1,21 @@
 const LeaveType = require("../../models/LeaveType");
+const { error, success } = require("../../utils/response");
 
 exports.createLeaveType = (req, res) => {
   const { type, description } = req.body;
 
   LeaveType.create({ type, description }, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return error(res, err);
 
-    res.status(201).json({
-      message: "Leave type created successfully",
-      id: result.insertId,
-    });
+    return success(result, {}, "Leave type created successfully", 201);
   });
 };
 
 exports.getAllLeaveTypes = (_req, res) => {
   LeaveType.findAll((err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return error(res, err);
 
-    res.json(rows);
+    return success(res, rows, "Leave types retrieved successfully");
   });
 };
 
@@ -25,12 +23,11 @@ exports.getLeaveTypeById = (req, res) => {
   const { id } = req.params;
 
   LeaveType.findById(id, (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return error(res, err);
 
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Leave type not found" });
+    if (rows.length === 0) return error(res, "Leave type not found", 404);
 
-    res.json(rows[0]);
+    return success(res, rows[0], "Leave type retrieved successfully");
   });
 };
 
@@ -40,12 +37,12 @@ exports.updateLeaveType = (req, res) => {
 
   if (dataToUpdate)
     LeaveType.update(id, dataToUpdate, (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
+      if (err) return error(res, err);
 
       if (result.affectedRows === 0)
-        return res.status(404).json({ message: "Leave type not found" });
+        return error(res, "Leave type not found", 404);
 
-      res.json({ message: "Leave type updated successfully" });
+      return success(res, {}, "Leave type updated successfully", 204);
     });
 };
 
@@ -53,11 +50,11 @@ exports.deleteLeaveType = (req, res) => {
   const { id } = req.params;
 
   LeaveType.delete(id, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return error(res, err);
 
     if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Leave type not found" });
+      return error(res, "Leave type not found", 404);
 
-    res.json({ message: "Leave type deleted successfully" });
+    return success(res, {}, "Leave type deleted successfully", 204);
   });
 };

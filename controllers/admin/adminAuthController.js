@@ -1,18 +1,18 @@
 const Admin = require("../../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { success, error } = require("../../utils/response");
 
 exports.login = (req, res) => {
   const { username, password } = req.body;
 
   Admin.findByUsername(username, (err, result) => {
     if (err || result.length === 0)
-      return res.status(401).json({ message: "Invalid credentials" });
+      return error(res, "Invalid credentials", 401);
 
     const admin = result[0];
     bcrypt.compare(password, admin.password, (_err, isMatch) => {
-      if (!isMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
+      if (!isMatch) return error(res, "Invalid credentials", 401);
 
       const token = jwt.sign(
         { adminId: admin.id, role: "admin" },
@@ -24,14 +24,11 @@ exports.login = (req, res) => {
 
       if (admin.firstLogin) {
         Admin.updateFirstLogin(admin.id, (err2) => {
-          if (err2)
-            return res
-              .status(500)
-              .json({ message: "Error updating first login flag" });
-          res.status(200).json({ token, firstLogin: false });
+          if (err2) return error(res, err2);
+          return success(res, { token, firstLogin: true }, "Login successful");
         });
       } else {
-        res.status(200).json({ token, firstLogin: false });
+        return success(res, { token, firstLogin: true }, "Login successful");
       }
     });
   });
@@ -42,19 +39,16 @@ exports.changePassword = (req, res) => {
   const adminId = req.adminId;
 
   Admin.findByUsername("admin", (err, result) => {
-    if (err || result.length === 0)
-      return res.status(400).json({ message: "Admin not found" });
+    if (err || result.length === 0) return error(res, "Admin not found", 400);
 
     const admin = result[0];
     bcrypt.compare(oldPassword, admin.password, async (_err, isMatch) => {
-      if (!isMatch)
-        return res.status(400).json({ message: "Incorrect old password" });
+      if (!isMatch) return error(res, "Incorrect old password", 400);
 
       const hashed = await bcrypt.hash(newPassword, 10);
       Admin.updatePassword(adminId, hashed, (err2) => {
-        if (err2)
-          return res.status(500).json({ message: "Error updating password" });
-        res.status(200).json({ message: "Password changed successfully" });
+        if (err2) return error(res, err2);
+        success(res, {}, "Password changed successfully");
       });
     });
   });

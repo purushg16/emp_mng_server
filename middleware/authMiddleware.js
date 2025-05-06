@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
+const { error } = require("../utils/response");
 
 module.exports = {
   verifyToken: (req, res, next) => {
     const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ message: "No token provided" });
+    if (!authHeader) return error(res, "No token provided", 401);
 
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) return res.status(403).json({ message: "Invalid token" });
+      if (err) return error(res, "Invalid token", 403);
 
       req.userId =
         decoded.role === "admin" ? decoded.adminId : decoded.employeeId;
@@ -19,14 +19,14 @@ module.exports = {
 
   isAdmin: (req, res, next) => {
     if (req.userRole !== "admin") {
-      return res.status(403).json({ message: "Admin access only" });
+      return error(res, "Admin access only", 403);
     }
     next();
   },
 
   isEmployee: (req, res, next) => {
     if (req.userRole !== "employee") {
-      return res.status(403).json({ message: "Employee access only" });
+      return error(res, "Employee access only", 403);
     }
     next();
   },

@@ -1,4 +1,5 @@
 const Leave = require("../../models/Leave");
+const { success, error } = require("../../utils/response");
 
 exports.getAllLeaves = (req, res) => {
   const status = req.query.status;
@@ -6,32 +7,31 @@ exports.getAllLeaves = (req, res) => {
   const validStatuses = ["pending", "approved", "declined"];
 
   if (status && !validStatuses.includes(status)) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Invalid status. Valid values are: 'pending', 'approved', 'declined'.",
-      });
+    return error(
+      res,
+      "Invalid status. Valid values are: 'pending', 'approved', 'declined'.",
+      400
+    );
   }
 
   Leave.findAll(status, (err, leaves) => {
-    if (err) return res.status(500).json({ message: "Error fetching leaves" });
+    if (err) return error(res, err);
 
     if (!leaves.length) {
-      return res.status(404).json({ message: "No leaves found" });
+      return error(res, "No leaves found", 404);
     }
 
-    res.status(200).json({ leaves });
+    return success(res, leaves, "Leaves retrieved successfully");
   });
 };
 
 exports.getLeaveById = (req, res) => {
   const id = req.params.id;
   Leave.findById(id, (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Leave not found" });
-    res.json(rows[0]);
+    if (err) return error(res, err);
+    if (rows.length === 0) return error(res, "Leave not found", 404);
+
+    return success(res, rows[0], "Leave retrieved successfully");
   });
 };
 
@@ -40,16 +40,15 @@ exports.updateLeaveStatus = (req, res) => {
   const { status, remark } = req.body;
 
   Leave.updateStatus(id, status, remark, (err) => {
-    if (err)
-      return res.status(500).json({ error: "Failed to update leave status" });
-    res.json({ message: "Leave status updated successfully" });
+    if (err) return error(res, err);
+    return success(res, {}, "Leave status updated successfully");
   });
 };
 
 exports.deleteLeave = (req, res) => {
   const id = req.params.id;
   Leave.delete(id, (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Leave deleted" });
+    if (err) return error(res, err);
+    return success(res, {}, "Leave deleted");
   });
 };

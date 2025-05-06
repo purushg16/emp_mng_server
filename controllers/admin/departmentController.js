@@ -1,18 +1,17 @@
 const Department = require("../../models/Department");
+const { success, error } = require("../../utils/response");
 
 exports.createDepartment = (req, res) => {
   Department.create(req.body, (err, _result) => {
-    if (err)
-      return res.status(500).json({ message: "Error creating department" });
-    res.status(201).json({ message: "Department created successfully" });
+    if (err) return error(res, err);
+    return success(res, {}, "Department created successfully", 201);
   });
 };
 
 exports.getAllDepartments = (_req, res) => {
   Department.findAll((err, departments) => {
-    if (err)
-      return res.status(500).json({ message: "Error fetching departments" });
-    res.status(200).json(departments);
+    if (err) return error(res, err);
+    return success(res, departments, "Departments fetched successfully", 201);
   });
 };
 
@@ -21,11 +20,11 @@ exports.updateDepartment = (req, res) => {
   const dataToUpdate = req.body;
 
   Department.updateById(id, dataToUpdate, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return error(res, err);
     if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Department not found" });
+      return error(res, "Department not found", 404);
 
-    res.json({ message: "Department updated successfully" });
+    return success(res, {}, "Department updated successfully");
   });
 };
 
@@ -33,11 +32,10 @@ exports.deleteDepartment = (req, res) => {
   const { id } = req.params;
 
   Department.deleteById(id, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-
+    if (err) return error(res, err);
     if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Department not found" });
+      return error(res, "Department not found", 404);
 
-    res.json({ message: "Department deleted successfully" });
+    return success(res, {}, "Department deleted successfully");
   });
 };

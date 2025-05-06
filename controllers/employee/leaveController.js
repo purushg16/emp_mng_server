@@ -1,4 +1,5 @@
 const Leave = require("../../models/Leave");
+const { error, success } = require("../../utils/response");
 
 exports.getEmployeeLeaves = (req, res) => {
   const employeeId = req.userId;
@@ -7,20 +8,18 @@ exports.getEmployeeLeaves = (req, res) => {
   const validStatuses = ["pending", "approved", "declined"];
 
   if (status && !validStatuses.includes(status)) {
-    return res.status(400).json({
-      message:
-        "Invalid status. Valid values are: 'pending', 'approved', 'declined'.",
-    });
+    return error(
+      res,
+      "Valid values are: 'pending', 'approved', 'declined'.",
+      400
+    );
   }
 
   Leave.findByEmployeeId(employeeId, status, (err, leaves) => {
-    if (err) return res.status(500).json({ message: "Error fetching leaves" });
+    if (err) return error(res, err);
+    if (!leaves.length) return error(res, "No leaves found", 404);
 
-    if (!leaves.length) {
-      return res.status(404).json({ message: "No leaves found" });
-    }
-
-    res.status(200).json({ leaves });
+    return success(res, leaves, "Leaves retrieved successfully");
   });
 };
 
@@ -29,13 +28,11 @@ exports.getLeaveById = (req, res) => {
   const employeeId = req.userId;
 
   Leave.findById(id, (err, leave) => {
-    if (err) return res.status(500).json({ message: "Error fetching leave" });
+    if (err) return error(res, err);
+    if (!leave || leave.employeeId !== employeeId)
+      return err(res, "Leave not found", 404);
 
-    if (!leave || leave.employeeId !== employeeId) {
-      return res.status(404).json({ message: "Leave not found" });
-    }
-
-    res.status(200).json({ leave });
+    return success(res, leave, "Leave retrieved successfully");
   });
 };
 
@@ -54,23 +51,15 @@ exports.createLeave = async (req, res) => {
     leaveReq.from,
     leaveReq.to,
     (err, result) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ message: "DB error during overlap check" });
-
+      if (err) return error(res, err);
       if (result.length > 0) {
-        return res
-          .status(400)
-          .json({ message: "Leave dates overlap with existing application" });
+        return error(res, "Leave dates overlap with existing leaves", 400);
       }
 
       // proceed with creation
-      Leave.create(leaveReq, (err2, _result2) => {
-        if (err2) {
-          return res.status(500).json({ message: "Error applying leave" });
-        }
-        res.status(201).json({ message: "Leave applied successfully" });
+      Leave.create(leaveReq, (err2, _result1) => {
+        if (err2) return error(res, err2);
+        return success(res, {}, "Leave applied successfully", 201);
       });
     }
   );

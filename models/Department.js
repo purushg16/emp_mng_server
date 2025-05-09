@@ -10,12 +10,29 @@ const Department = {
     );
   },
 
-  findAll: (cb) => {
-    db.query("SELECT * FROM department", cb);
+  countAll: ({ search = "" }, cb) => {
+    const searchTerm = `%${search}%`;
+    const query =
+      "SELECT COUNT(*) AS count FROM department WHERE " +
+      "`code` LIKE ? OR `name` LIKE ? OR `shortName` LIKE ?";
+    db.query(query, [searchTerm, searchTerm, searchTerm], cb);
   },
 
-  findByCode: (code, cb) => {
-    db.query("SELECT * FROM department WHERE code = ?", [code], cb);
+  findAll: ({ page = 1, page_size = 10, search = "" }, cb) => {
+    const limit = parseInt(page_size);
+    const offset = (parseInt(page) - 1) * limit;
+    const searchTerm = `%${search}%`;
+
+    const query =
+      "SELECT * FROM department WHERE " +
+      "`code` LIKE ? OR `name` LIKE ? OR `shortName` LIKE ? " +
+      "LIMIT ? OFFSET ?";
+
+    db.query(query, [searchTerm, searchTerm, searchTerm, limit, offset], cb);
+  },
+
+  find: (id, cb) => {
+    db.query("SELECT * FROM department WHERE id = ?", [id], cb);
   },
 
   updateById: (id, data, cb) => {

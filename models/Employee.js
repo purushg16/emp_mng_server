@@ -71,12 +71,44 @@ const Employee = {
     );
   },
 
-  findAll: (cb) => {
-    db.query("SELECT * FROM employee", cb);
+  countAll: ({ search = "" }, cb) => {
+    const searchTerm = `%${search}%`;
+
+    const query =
+      "SELECT COUNT(*) AS count FROM employee WHERE " +
+      "`firstName` LIKE ? OR `lastName` LIKE ? OR `code` LIKE ?";
+
+    db.query(query, [searchTerm, searchTerm, searchTerm], cb);
+  },
+
+  findAll: ({ page = 1, page_size = 10, search = "" }, cb) => {
+    const limit = parseInt(page_size);
+    const offset = (parseInt(page) - 1) * limit;
+    const searchTerm = `%${search}%`;
+
+    const query =
+      "SELECT * FROM employee WHERE " +
+      "`firstName` LIKE ? OR `lastName` LIKE ? OR `code` LIKE ? " +
+      "LIMIT ? OFFSET ?";
+
+    db.query(query, [searchTerm, searchTerm, searchTerm, limit, offset], cb);
   },
 
   findById: (id, cb) => {
     db.query("SELECT * FROM employee WHERE id = ?", [id], cb);
+  },
+
+  getProfile: (employeeId, cb) => {
+    const query = `
+    SELECT 
+      e.code, e.firstName, e.lastName, e.email, e.mobile, e.gender, e.birthday, 
+      e.departmentId, e.country, e.city, e.address, e.createdAt,
+      d.name AS departmentName
+    FROM employee e
+    LEFT JOIN department d ON e.departmentId = d.id
+    WHERE e.id = ?
+  `;
+    db.query(query, [employeeId], cb);
   },
 
   update: (id, data, cb) => {

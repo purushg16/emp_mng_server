@@ -2,8 +2,7 @@ const Leave = require("../../models/Leave");
 const { error, success } = require("../../utils/response");
 
 exports.getEmployeeLeaves = (req, res) => {
-  const employeeId = req.userId;
-  const status = req.query.status;
+  const { status, employeeId, page_size } = req.query;
 
   const validStatuses = ["pending", "approved", "declined"];
 
@@ -15,11 +14,32 @@ exports.getEmployeeLeaves = (req, res) => {
     );
   }
 
-  Leave.findByEmployeeId(employeeId, status, (err, leaves) => {
+  Leave.countAll({ status, employeeId }, (err, result) => {
     if (err) return error(res, err);
-    if (!leaves.length) return error(res, "No leaves found", 404);
+    const totalLeaves = result[0].count;
 
-    return success(res, leaves, "Leaves retrieved successfully");
+    if (totalLeaves === 0) {
+      return success(req, res, {}, "No leaves found", 200);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(page_size) || 10;
+
+    Leave.findAll(
+      { status, employeeId, page, page_size: pageSize },
+      (err2, leaves) => {
+        if (err2) return error(res, err2);
+
+        return success(
+          req,
+          res,
+          leaves,
+          "Leaves retrieved successfully",
+          200,
+          totalLeaves
+        );
+      }
+    );
   });
 };
 
@@ -32,7 +52,7 @@ exports.getLeaveById = (req, res) => {
     if (!leave || leave.employeeId !== employeeId)
       return err(res, "Leave not found", 404);
 
-    return success(res, leave, "Leave retrieved successfully");
+    return success(req, res, leave, "Leave retrieved successfully");
   });
 };
 
@@ -59,7 +79,7 @@ exports.createLeave = async (req, res) => {
       // proceed with creation
       Leave.create(leaveReq, (err2, _result1) => {
         if (err2) return error(res, err2);
-        return success(res, {}, "Leave applied successfully", 201);
+        return success(req, res, {}, "Leave applied successfully", 201);
       });
     }
   );

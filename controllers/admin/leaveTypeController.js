@@ -6,15 +6,15 @@ exports.createLeaveType = (req, res) => {
 
   LeaveType.create({ type, description }, (err) => {
     if (err) return error(res, err);
-    return success(res, {}, "Leave type created successfully", 201);
+    return success(req, res, {}, "Leave type created successfully", 201);
   });
 };
 
-exports.getAllLeaveTypes = (_req, res) => {
+exports.getAllLeaveTypes = (req, res) => {
   LeaveType.findAll((err, rows) => {
     if (err) return error(res, err);
 
-    return success(res, rows, "Leave types retrieved successfully");
+    return success(req, res, rows, "Leave types retrieved successfully");
   });
 };
 
@@ -26,7 +26,7 @@ exports.getLeaveTypeById = (req, res) => {
 
     if (rows.length === 0) return error(res, "Leave type not found", 404);
 
-    return success(res, rows[0], "Leave type retrieved successfully");
+    return success(req, res, rows[0], "Leave type retrieved successfully");
   });
 };
 
@@ -41,7 +41,7 @@ exports.updateLeaveType = (req, res) => {
       if (result.affectedRows === 0)
         return error(res, "Leave type not found", 404);
 
-      return success(res, { id }, "Leave type updated successfully");
+      return success(req, res, { id }, "Leave type updated successfully");
     });
 };
 
@@ -54,6 +54,6 @@ exports.deleteLeaveType = (req, res) => {
     if (result.affectedRows === 0)
       return error(res, "Leave type not found", 404);
 
-    return success(res, {}, "Leave type deleted successfully", 204);
+    return success(req, res, {}, "Leave type deleted successfully", 204);
   });
 };

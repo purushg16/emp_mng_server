@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { buildLeaveFilters } = require("../utils/queryBuilder");
 
 const Leave = {
   create: (data, cb) => {
@@ -21,7 +22,20 @@ const Leave = {
     );
   },
 
-  findAll: (status, cb) => {
+  countAll: ({ status = null, employeeId = null }, cb) => {
+    const { whereClause, values } = buildLeaveFilters({ status, employeeId });
+
+    const query = `SELECT COUNT(*) AS count FROM leaves l ${whereClause}`;
+
+    db.query(query, values, cb);
+  },
+
+  findAll: (
+    { status = null, employeeId = null, page = 1, page_size = 10 },
+    cb
+  ) => {
+    const { whereClause, values } = buildLeaveFilters({ status, employeeId });
+
     let query = `
       SELECT l.*, 
              e.firstName, e.lastName, 
@@ -29,20 +43,15 @@ const Leave = {
       FROM leaves l
       JOIN employee e ON l.employeeId = e.id
       JOIN leave_type lt ON l.leaveTypeId = lt.id
+      ${whereClause}
+      ORDER BY l.postedAt DESC
+      LIMIT ? OFFSET ?
     `;
 
-    const values = [];
+    const limit = parseInt(page_size);
+    const offset = (parseInt(page) - 1) * limit;
 
-    // Add status condition if it's provided
-    if (status) {
-      query += " WHERE l.status = ?";
-      values.push(status);
-    }
-
-    // Ordering remains the same
-    query += " ORDER BY l.postedAt DESC";
-
-    db.query(query, values, cb);
+    db.query(query, [...values, limit, offset], cb);
   },
 
   findById: (id, cb) => {
@@ -52,7 +61,10 @@ const Leave = {
     });
   },
 
-  findByEmployeeId: (employeeId, status, cb) => {
+  findByEmployeeId: (
+    { employeeId, status = null, page = 1, page_size = 10 },
+    cb
+  ) => {
     let sql = "SELECT * FROM leaves WHERE employeeId = ?";
     const params = [employeeId];
 
@@ -60,6 +72,14 @@ const Leave = {
       sql += " AND status = ?";
       params.push(status);
     }
+
+    sql += " ORDER BY postedAt DESC";
+
+    const limit = parseInt(page_size);
+    const offset = (parseInt(page) - 1) * limit;
+
+    sql += " LIMIT ? OFFSET ?";
+    params.push(limit, offset);
 
     db.query(sql, params, cb);
   },

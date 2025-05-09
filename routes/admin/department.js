@@ -8,6 +8,7 @@ const validate = require("../../middleware/validate");
 
 const router = express.Router();
 
+router.get("/get/:id", departmentController.get);
 router.get("/getAll", departmentController.getAllDepartments);
 
 router.post(

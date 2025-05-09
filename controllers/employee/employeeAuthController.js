@@ -4,6 +4,17 @@ const Employee = require("../../models/Employee");
 const LoginHistory = require("../../models/LoginHistory");
 const { error, success } = require("../../utils/response");
 
+exports.getProfile = (req, res) => {
+  const { userId } = req;
+
+  Employee.getProfile(userId, (err, profile) => {
+    if (err) return error(res, err);
+    if (!profile) return error(res, "Employee not found", 404);
+
+    return success(req, res, profile, "Profile fetched successfully");
+  });
+};
+
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
@@ -30,6 +41,7 @@ exports.login = (req, res) => {
 
           const loginCount = countResult[0].count;
           return success(
+            req,
             res,
             { token, employee, loginCount },
             "Login successful"
@@ -41,7 +53,7 @@ exports.login = (req, res) => {
 };
 
 exports.updateProfile = (req, res) => {
-  const { employeeId, userRole } = req;
+  const { userId, userRole } = req;
   const updates = { ...req.body };
 
   // Restricting Employee from updating certain fields
@@ -57,10 +69,10 @@ exports.updateProfile = (req, res) => {
     return error(res, "No data provided for update", 400);
   }
 
-  Employee.update(employeeId, updates, (err) => {
+  Employee.update(userId, updates, (err) => {
     if (err) return error(res, err);
 
-    return success(res, {}, "Profile updated successfully");
+    return success(req, res, {}, "Profile updated successfully");
   });
 };
 
@@ -90,7 +102,7 @@ exports.updatePassword = (req, res) => {
         Employee.updatePassword(req.userId, hashedPassword, (err4) => {
           if (err4) return error(res, err4);
 
-          return success(res, {}, "Password updated successfully");
+          return success(req, res, {}, "Password updated successfully");
         });
       });
     });

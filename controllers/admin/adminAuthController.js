@@ -25,10 +25,20 @@ exports.login = (req, res) => {
       if (admin.firstLogin) {
         Admin.updateFirstLogin(admin.id, (err2) => {
           if (err2) return error(res, err2);
-          return success(res, { token, firstLogin: true }, "Login successful");
+          return success(
+            req,
+            res,
+            { token, firstLogin: true },
+            "Login successful"
+          );
         });
       } else {
-        return success(res, { token, firstLogin: true }, "Login successful");
+        return success(
+          req,
+          res,
+          { token, firstLogin: true },
+          "Login successful"
+        );
       }
     });
   });
@@ -48,7 +58,7 @@ exports.changePassword = (req, res) => {
       const hashed = await bcrypt.hash(newPassword, 10);
       Admin.updatePassword(adminId, hashed, (err2) => {
         if (err2) return error(res, err2);
-        success(res, {}, "Password changed successfully");
+        success(req, res, {}, "Password changed successfully");
       });
     });
   });

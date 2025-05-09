@@ -72,7 +72,7 @@ exports.updatePassword = (req, res) => {
   if (newPassword.length < 6)
     return error(res, "password must be at least 6 characters", 400);
 
-  Employee.findById(req.employeeId, (err, result) => {
+  Employee.findById(req.userId, (err, result) => {
     if (err || result.length === 0) {
       return error(res, "Employee not found", 404);
     }
@@ -87,7 +87,7 @@ exports.updatePassword = (req, res) => {
       bcrypt.hash(newPassword, 10, (err3, hashedPassword) => {
         if (err3) return error(res, err3);
 
-        Employee.updatePassword(req.employeeId, hashedPassword, (err4) => {
+        Employee.updatePassword(req.userId, hashedPassword, (err4) => {
           if (err4) return error(res, err4);
 
           return success(res, {}, "Password updated successfully");

@@ -7,8 +7,9 @@ const app = express();
 
 // === Middlewares ===
 app.use(cors());
+app.use(express.json());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //  === Routes ===
 app.use("/api/admin", require("./routes/admin"));

@@ -1,5 +1,8 @@
 exports.success = (res, data = {}, message = "Success", statusCode = 200) => {
-  return res.status(statusCode).json({ success: true, message, data });
+  data = Array.isArray(data) ? data : [data];
+  const response = { success: true, data, message, statusCode };
+  console.log(response);
+  return res.status(statusCode).json(response);
 };
 
 exports.error = (res, error = null, statusCode = 500) => {

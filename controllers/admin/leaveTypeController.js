@@ -4,10 +4,9 @@ const { error, success } = require("../../utils/response");
 exports.createLeaveType = (req, res) => {
   const { type, description } = req.body;
 
-  LeaveType.create({ type, description }, (err, result) => {
+  LeaveType.create({ type, description }, (err) => {
     if (err) return error(res, err);
-
-    return success(result, {}, "Leave type created successfully", 201);
+    return success(res, {}, "Leave type created successfully", 201);
   });
 };
 
@@ -22,7 +21,7 @@ exports.getAllLeaveTypes = (_req, res) => {
 exports.getLeaveTypeById = (req, res) => {
   const { id } = req.params;
 
-  LeaveType.findById(id, (err, rows) => {
+  LeaveType.find(id, (err, rows) => {
     if (err) return error(res, err);
 
     if (rows.length === 0) return error(res, "Leave type not found", 404);
@@ -42,7 +41,7 @@ exports.updateLeaveType = (req, res) => {
       if (result.affectedRows === 0)
         return error(res, "Leave type not found", 404);
 
-      return success(res, {}, "Leave type updated successfully", 204);
+      return success(res, { id }, "Leave type updated successfully");
     });
 };
 

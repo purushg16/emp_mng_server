@@ -84,7 +84,7 @@ const updateEmployeeSchema = yup.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
       "Valid Birthday is required"
     )
-    .required("Birthday is required"),
+    .optional(),
   departmentId: yup.number().integer("Valid department ID").optional(),
   country: yup.string().trim().optional(),
   city: yup.string().trim().optional(),

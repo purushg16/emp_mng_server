@@ -56,9 +56,23 @@ exports.updateProfile = (req, res) => {
   const { userId, userRole } = req;
   const updates = { ...req.body };
 
+  if (updates.birthday) {
+    updates.birthday = new Date(updates.birthday);
+  }
+
+  if (updates.createdAt) {
+    updates.createdAt = new Date(updates.createdAt);
+  }
+
   // Restricting Employee from updating certain fields
   if (userRole === "employee") {
-    const restrictedFields = ["code", "departmentId", "status"];
+    const restrictedFields = [
+      "code",
+      "departmentId",
+      "status",
+      "departmentName",
+      "lastLogin",
+    ];
 
     Object.keys(updates).forEach((key) => {
       if (restrictedFields.includes(key)) delete updates[key];

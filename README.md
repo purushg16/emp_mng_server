@@ -1,5 +1,3 @@
-Sure! Here's a well-structured `README.md` template for your **Employee Leave Management System** built with **Node.js, MySQL, React, Formik, Yup, and Material-UI**:
-
 ---
 
 ```markdown

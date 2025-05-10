@@ -95,6 +95,7 @@ const Employee = {
     const searchTerm = `%${search}%`;
 
     const fields = [
+      "id",
       "firstName",
       "lastName",
       "email",

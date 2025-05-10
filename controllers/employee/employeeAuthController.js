@@ -16,9 +16,9 @@ exports.getProfile = (req, res) => {
 };
 
 exports.login = (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  Employee.findByEmail(email, (err, result) => {
+  Employee.findOne(username, (err, result) => {
     if (err || result.length === 0)
       return error(res, "Invalid Credentials", 401);
 

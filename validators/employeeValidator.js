@@ -33,8 +33,11 @@ const addEmployeeSchema = yup.object({
     .required(),
   birthday: yup
     .string()
-    .matches(/^\d{4}-\d{2}-\d{2}$/, "Valid birthday is required")
-    .required(),
+    .matches(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      "Valid Birthday is required"
+    )
+    .required("Birthday is required"),
   departmentId: yup
     .number()
     .integer("Valid department ID is required")
@@ -77,8 +80,11 @@ const updateEmployeeSchema = yup.object({
     .optional(),
   birthday: yup
     .string()
-    .matches(/^\d{4}-\d{2}-\d{2}$/, "Valid birthday")
-    .optional(),
+    .matches(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      "Valid Birthday is required"
+    )
+    .required("Birthday is required"),
   departmentId: yup.number().integer("Valid department ID").optional(),
   country: yup.string().trim().optional(),
   city: yup.string().trim().optional(),

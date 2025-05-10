@@ -5,6 +5,14 @@ const Employee = {
     db.query("SELECT * FROM employee WHERE email = ?", [email], cb);
   },
 
+  findOne: (query, cb) => {
+    db.query(
+      "SELECT * FROM employee WHERE status = ? AND email = ? OR CODE = ?",
+      ["active", query, query],
+      cb
+    );
+  },
+
   updateLoginHistory: (id, cb) => {
     db.query(
       `UPDATE employees
@@ -86,8 +94,24 @@ const Employee = {
     const offset = (parseInt(page) - 1) * limit;
     const searchTerm = `%${search}%`;
 
+    const fields = [
+      "firstName",
+      "lastName",
+      "email",
+      "mobile",
+      "code",
+      "gender",
+      "birthday",
+      "departmentId",
+      "country",
+      "city",
+      "address",
+      "status",
+      "createdAt",
+    ];
+
     const query =
-      "SELECT * FROM employee WHERE " +
+      `SELECT ${fields.join(", ")} FROM employee WHERE ` +
       "`firstName` LIKE ? OR `lastName` LIKE ? OR `code` LIKE ? " +
       "LIMIT ? OFFSET ?";
 
@@ -111,11 +135,11 @@ const Employee = {
     db.query(query, [employeeId], cb);
   },
 
-  update: (id, data, cb) => {
+  update: (id, data, cb, admin = false) => {
     const fields = [];
     const values = [];
 
-    const protectedFields = ["code", "status", "departmentId"];
+    const protectedFields = admin ? [] : ["code", "status", "departmentId"];
 
     for (let key in data) {
       if (protectedFields.includes(key)) continue;

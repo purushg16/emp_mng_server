@@ -5,8 +5,11 @@ const { success, error } = require("../../utils/response");
 exports.createEmployee = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const employeeData = { ...req.body, password: hashedPassword };
-
+    const employeeData = {
+      ...req.body,
+      password: hashedPassword,
+      birthday: new Date(req.body.birthday),
+    };
     Employee.create(employeeData, (err, _result) => {
       if (err) return error(res, err);
       return success(req, res, {}, "Employee created successfully");
@@ -52,18 +55,16 @@ exports.updateEmployee = (req, res) => {
   const { id } = req.params;
   const data = req.body;
 
-  if (!id) return error(res, "ID is required", 400);
-
-  // Check if the password is being updated with hashing
-  if (data.password) {
-    bcrypt.hash(data.password, 10, (err, hashed) => {
-      if (err) return error(res, err);
-      data.password = hashed;
-      Employee.update(id, data, handleUpdate);
-    });
-  } else {
-    Employee.update(id, data, handleUpdate);
+  if (data.birthday) {
+    data.birthday = new Date(data.birthday);
   }
+
+  if (data.password) {
+    delete data.password;
+  }
+
+  if (!id) return error(res, "ID is required", 400);
+  Employee.update(id, data, handleUpdate, true);
 
   function handleUpdate(err, _result) {
     if (err) {

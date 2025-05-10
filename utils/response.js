@@ -23,6 +23,7 @@ exports.success = (
   const next = currentPage < totalPages ? buildUrl(currentPage + 1) : null;
   const prev = currentPage > 1 ? buildUrl(currentPage - 1) : null;
 
+  data = Array.isArray(data) ? data : [data];
   const response = {
     success: true,
     message,

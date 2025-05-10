@@ -17,7 +17,7 @@ router.post(
   departmentController.createDepartment
 );
 
-router.post(
+router.put(
   "/update/:id",
   validate(updateDepartmentSchema),
   departmentController.updateDepartment

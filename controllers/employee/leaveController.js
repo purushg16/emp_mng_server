@@ -1,5 +1,14 @@
 const Leave = require("../../models/Leave");
+const LeaveType = require("../../models/LeaveType");
 const { error, success } = require("../../utils/response");
+
+exports.getAllLeaveTypes = (req, res) => {
+  LeaveType.findAll((err, rows) => {
+    if (err) return error(res, err);
+
+    return success(req, res, rows, "Leave types retrieved successfully");
+  });
+};
 
 exports.getEmployeeLeaves = (req, res) => {
   const { status, employeeId, page_size } = req.query;
@@ -16,9 +25,9 @@ exports.getEmployeeLeaves = (req, res) => {
 
   Leave.countAll({ status, employeeId }, (err, result) => {
     if (err) return error(res, err);
-    const totalLeaves = result[0].count;
+    const total = result[0].count;
 
-    if (totalLeaves === 0) {
+    if (total === 0) {
       return success(req, res, {}, "No leaves found", 200);
     }
 
@@ -30,14 +39,11 @@ exports.getEmployeeLeaves = (req, res) => {
       (err2, leaves) => {
         if (err2) return error(res, err2);
 
-        return success(
-          req,
-          res,
-          leaves,
-          "Leaves retrieved successfully",
-          200,
-          totalLeaves
-        );
+        return success(req, res, leaves, "Leaves retrieved successfully", 200, {
+          page,
+          page_size,
+          total,
+        });
       }
     );
   });

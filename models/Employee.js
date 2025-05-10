@@ -127,9 +127,10 @@ const Employee = {
     SELECT 
       e.code, e.firstName, e.lastName, e.email, e.mobile, e.gender, e.birthday, 
       e.departmentId, e.country, e.city, e.address, e.createdAt,
-      d.name AS departmentName
+      d.name AS departmentName, l.loginAt AS lastLogin
     FROM employee e
     LEFT JOIN department d ON e.departmentId = d.id
+    LEFT JOIN login_history l ON e.id = l.employeeId
     WHERE e.id = ?
   `;
     db.query(query, [employeeId], cb);

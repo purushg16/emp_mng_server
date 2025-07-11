@@ -9,6 +9,7 @@ const router = express.Router();
 
 // Employee Login
 router.post("/auth/login", employeeAuth.login);
+router.post("/auth/logout", employeeAuth.logout);
 
 // Protected routes
 router.use("/profile", verifyToken, profile);

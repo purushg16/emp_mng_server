@@ -3,6 +3,20 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { success, error } = require("../../utils/response");
 
+exports.status = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ authenticated: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ authenticated: true, role: decoded.role });
+  } catch {
+    res.status(403).json({ authenticated: false });
+  }
+};
+
 exports.login = (req, res) => {
   const { username, password } = req.body;
 
@@ -11,34 +25,40 @@ exports.login = (req, res) => {
       return error(res, "Invalid credentials", 401);
 
     const admin = result[0];
+
     bcrypt.compare(password, admin.password, (_err, isMatch) => {
       if (!isMatch) return error(res, "Invalid credentials", 401);
 
       const token = jwt.sign(
         { adminId: admin.id, role: "admin" },
         process.env.JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
+        { expiresIn: "1d" }
       );
+
+      // Set secure, HttpOnly cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      const handleSuccess = () => {
+        return success(
+          req,
+          res,
+          { firstLogin: !!admin.firstLogin },
+          "Login successful"
+        );
+      };
 
       if (admin.firstLogin) {
         Admin.updateFirstLogin(admin.id, (err2) => {
           if (err2) return error(res, err2);
-          return success(
-            req,
-            res,
-            { token, firstLogin: true },
-            "Login successful"
-          );
+          handleSuccess();
         });
       } else {
-        return success(
-          req,
-          res,
-          { token, firstLogin: true },
-          "Login successful"
-        );
+        handleSuccess();
       }
     });
   });
@@ -62,4 +82,13 @@ exports.changePassword = (req, res) => {
       });
     });
   });
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  });
+  success(req, res, {}, "Logged out successfully!");
 };

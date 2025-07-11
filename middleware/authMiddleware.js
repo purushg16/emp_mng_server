@@ -3,12 +3,15 @@ const { error } = require("../utils/response");
 
 module.exports = {
   verifyToken: (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return error(res, "No token provided", 401);
+    const token = req.cookies?.token;
+    if (!token) {
+      return error(res, "No token provided", 401);
+    }
 
-    const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) return error(res, "Invalid token", 403);
+      if (err) {
+        return error(res, "Invalid token", 403);
+      }
 
       req.userId =
         decoded.role === "admin" ? decoded.adminId : decoded.employeeId;

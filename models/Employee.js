@@ -46,6 +46,7 @@ const Employee = {
       birthday,
       departmentId,
       country,
+      salary,
       city,
       address,
     } = data;
@@ -54,8 +55,8 @@ const Employee = {
       INSERT INTO employee (
         firstName, lastName, email, mobile, password,
         code, gender, birthday, departmentId,
-        country, city, address, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        country, city, address, status, salary
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(
@@ -74,6 +75,7 @@ const Employee = {
         city,
         address,
         status || "active",
+        salary,
       ],
       cb
     );
@@ -101,6 +103,7 @@ const Employee = {
       "email",
       "mobile",
       "code",
+      "salary",
       "gender",
       "birthday",
       "departmentId",

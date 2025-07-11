@@ -4,6 +4,20 @@ const Employee = require("../../models/Employee");
 const LoginHistory = require("../../models/LoginHistory");
 const { error, success } = require("../../utils/response");
 
+exports.status = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ authenticated: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ authenticated: true, role: decoded.role });
+  } catch {
+    res.status(403).json({ authenticated: false });
+  }
+};
+
 exports.getProfile = (req, res) => {
   const { userId } = req;
 
@@ -25,7 +39,9 @@ exports.login = (req, res) => {
     const employee = result[0];
 
     bcrypt.compare(password, employee.password, (_err2, isMatch) => {
-      if (!isMatch) return error(res, "Invalid Credentials", 401);
+      if (!isMatch) {
+        return error(res, "Invalid Credentials", 401);
+      }
 
       const token = jwt.sign(
         { employeeId: employee.id, role: "employee" },
@@ -34,16 +50,29 @@ exports.login = (req, res) => {
       );
 
       LoginHistory.log(employee.id, (logErr) => {
-        if (logErr) console.error("Login history failed:", logErr);
+        if (logErr) {
+          console.error("Login history failed:", logErr);
+        }
 
         LoginHistory.countByEmployeeId(employee.id, (countErr, countResult) => {
-          if (countErr) return error(res, countErr);
+          if (countErr) {
+            return error(res, countErr);
+          }
 
+          res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+          });
+
+          const { password, ...safeEmployee } = employee;
           const loginCount = countResult[0].count;
+
           return success(
             req,
             res,
-            { token, employee, loginCount },
+            { safeEmployee, loginCount },
             "Login successful"
           );
         });
@@ -121,4 +150,13 @@ exports.updatePassword = (req, res) => {
       });
     });
   });
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  });
+  success(req, res, {}, "Logged out successfully!");
 };

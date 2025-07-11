@@ -42,6 +42,11 @@ const addEmployeeSchema = yup.object({
     .number()
     .integer("Valid department ID is required")
     .required(),
+  salary: yup
+    .number()
+    .min(10000, "Salary should in be 10K")
+    .max(100000, "Salary of 100000 is max")
+    .required("Salary is required"),
   country: yup.string().trim().required("Country is required"),
   city: yup.string().trim().required("City is required"),
   address: yup.string().trim().required("Address is required"),
@@ -59,6 +64,11 @@ const updateEmployeeSchema = yup.object({
       "Status must be either 'active' or 'inactive'"
     )
     .optional(),
+  salary: yup
+    .number()
+    .min(10000, "Salary should in be 10K")
+    .max(100000, "Salary of 100000 is max")
+    .required("Salary is required"),
   mobile: yup
     .string()
     .matches(/^\d+$/, "Mobile must be numeric")

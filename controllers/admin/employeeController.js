@@ -55,6 +55,8 @@ exports.updateEmployee = (req, res) => {
   const { id } = req.params;
   const data = req.body;
 
+  console.log(data);
+
   if (data.birthday) {
     data.birthday = new Date(data.birthday);
   }
